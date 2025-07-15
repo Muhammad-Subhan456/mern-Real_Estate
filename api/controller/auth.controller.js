@@ -63,6 +63,7 @@ export const google = async (req, res, next) => {
         email: req.body.email,
         password: hashedPassword,
         avatar: req.body.photo
+        
       });
 
       await newUser.save();
