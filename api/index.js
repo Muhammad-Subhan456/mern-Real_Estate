@@ -7,6 +7,7 @@ import uploadRoute from './routes/upload.routes.js';
 import cloudinary from "./utils/cloudinary.js";
 import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>{
@@ -18,6 +19,7 @@ mongoose.connect(process.env.MONGO).then(()=>{
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cookieParser())
 
 app.use(fileUpload({
   useTempFiles: true,
