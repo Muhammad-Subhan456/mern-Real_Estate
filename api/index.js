@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv"
 import userRouter from "./routes/user.routes.js"
 import authRouter from "./routes/auth.routes.js"
+import uploadRoute from './routes/upload.routes.js';
+import cloudinary from "./utils/cloudinary.js";
+import fileUpload from "express-fileupload";
+import bodyParser from "body-parser";
+
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>{
     console.log("Connected to Mongodb!");
@@ -11,8 +16,20 @@ mongoose.connect(process.env.MONGO).then(()=>{
 })
 
 const app = express();
-
 app.use(express.json());
+app.use(bodyParser.json());
+
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: "/tmp/",  
+  parseNested: true            
+}));
+
+cloudinary.config({
+    cloud_name: "djlsmgzgp",
+    api_key: "755551889835639",
+    api_secret: "-L6mEDeHTaGeBpl07KBOxMI_Oks"
+})
 
 app.listen(3000,()=>{
     console.log(`Server is Running on Port 3000!!!!`)
@@ -23,6 +40,7 @@ app.use("/api/user",userRouter)
 
 app.use("/api/auth",authRouter)
 
+app.use('/api/upload', uploadRoute);
 
 // middleware for error handling
 app.use((err,req,res,next)=>{
