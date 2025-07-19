@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import { errorHandler } from "../utils/error.js";   
 import bcryptjs from "bcryptjs";
 import cloudinary from "../utils/cloudinary.js";
+import { trusted } from "mongoose";
 export const test = (req, res) => {
     console.log("Hello World");
     res.send("Well DOne"); // ✅ important: send a response
@@ -39,3 +40,16 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const deleteUser = async(req,res,next) => {
+    if (req.user.id !== req.params.id) return next(errorHandler(401, "You can only delete your account"));
+  try {
+    await User.findByIdAndDelete(req.params.id)
+    res.clearCookie('access_token')
+    res.status(200).json('User has been deleted')
+
+  } catch (error) {
+     next(error)
+  }
+}
