@@ -8,7 +8,8 @@ export default function Profile() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(currentUser.avatar.url || "");
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState({});
+  console.log(formData);
 
   // Handle File Select
   const handleFileChange = async (e) => {
@@ -28,32 +29,33 @@ export default function Profile() {
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (file) {
-      const formData = new FormData();
-      formData.append("avatar", file); 
-      formData.append("email", currentUser.email);
+  const updatedData = new FormData();
 
-      try {
-        const res = await fetch("/api/upload", {
-          method: "PUT",
-          body: formData,
-        });
+  if (file) updatedData.append("avatar", file);
+  if (formData.username) updatedData.append("username", formData.username);
+  if (formData.email) updatedData.append("email", formData.email);
+  if (formData.password) updatedData.append("password", formData.password);
 
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || "Upload failed");
-        }
+  try {
+    const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      method: "PUT",
+      body: updatedData,
+    });
 
-        dispatch(updateUser(data.user))
-        
-      } catch (err) {
-        console.error("Upload error:", err.message);
-      }
-    }
+    const data = await res.json();
 
-    // Optionally send avatarUrl to update user profile in DB here
+    if (!res.ok) throw new Error(data.message);
+
+    dispatch(updateUser(data.updatedUser)); // assuming updated user is returned
+  } catch (err) {
+    console.error("Update failed:", err.message);
+  }
+};
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   return (
@@ -78,18 +80,27 @@ export default function Profile() {
           placeholder="username"
           id="username"
           className="border p-3 rounded-lg"
+          value={formData.username || currentUser.username}
+          onChange={(e) =>
+            setFormData({ ...formData, username: e.target.value })
+          }
         />
         <input
           type="email"
           placeholder="email"
           id="email"
           className="border p-3 rounded-lg"
+          value={formData.email || currentUser.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
         <input
-          type="text"
+          type="password"
           placeholder="password"
           id="password"
           className="border p-3 rounded-lg"
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
         />
         <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80">
           update
