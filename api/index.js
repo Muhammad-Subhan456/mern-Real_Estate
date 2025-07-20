@@ -9,6 +9,7 @@ import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import listingRouter from "./routes/listing.routes.js"
+import uploadRoutes from './routes/listing.upload.routes.js';
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>{
     console.log("Connected to Mongodb!");
@@ -45,6 +46,7 @@ app.use("/api/auth",authRouter)
 app.use("/api/listing",listingRouter)
 
 app.use('/api/upload', uploadRoute);
+app.use('/api/upload-listing', uploadRoutes);
 
 // middleware for error handling
 app.use((err,req,res,next)=>{
