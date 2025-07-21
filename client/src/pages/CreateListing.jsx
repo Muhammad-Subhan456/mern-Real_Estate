@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-
+import {useNavigate} from "react-router-dom";
 export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
   const [imageUrls, setImageUrls] = useState([]); // Store Cloudinary URLs
   const { currentUser } = useSelector((state) => state.user);
-  
+  const navigate = useNavigate();
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -98,6 +98,7 @@ export default function CreateListing() {
       const data = await res.json();
       if (data.success) {
         alert("Listing created!");
+        navigate(`/listing/${data.listing._id}`); // Redirect to the new listing page
       } else {
         alert("Failed to create listing");
       }

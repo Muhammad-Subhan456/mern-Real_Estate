@@ -3,6 +3,7 @@ import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
 import cloudinary from "../utils/cloudinary.js";
 import { trusted } from "mongoose";
+import Listing from "../models/listing.models.js";
 export const test = (req, res) => {
     console.log("Hello World");
     res.send("Well DOne"); // ✅ important: send a response
@@ -52,4 +53,21 @@ export const deleteUser = async(req,res,next) => {
   } catch (error) {
      next(error)
   }
+}
+
+export const getUserListings = async (req, res, next) => {
+    if(req.user.id === req.params.id){
+      try {
+        const listings = await Listing.find({ userRef: req.params.id });
+        res.status(200).json(listings);
+        
+      } catch (error) {
+          next(error);
+      }
+    }
+    else{
+      return next(errorHandler(401, "You can only get your own listings"));
+    }
+  
+
 }
