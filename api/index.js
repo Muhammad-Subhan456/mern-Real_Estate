@@ -39,14 +39,11 @@ app.listen(3000,()=>{
 })
 
 // flow = index -> routes (endpoints) -> controller(api)
-app.use("/api/user",userRouter)
-
-app.use("/api/auth",authRouter)
-
-app.use("/api/listing",listingRouter)
-
-app.use('/api/upload', uploadRoute);
-app.use('/api/upload-listing', uploadRoutes);
+app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/listing", listingRouter); // handles /api/listing/create
+app.use('/api/upload', uploadRoute); // (if you use this elsewhere)
+app.use('/api/upload-listing', uploadRoutes); // for image upload
 
 // middleware for error handling
 app.use((err,req,res,next)=>{

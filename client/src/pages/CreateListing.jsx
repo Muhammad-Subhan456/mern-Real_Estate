@@ -1,9 +1,13 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
+  const [imageUrls, setImageUrls] = useState([]); // Store Cloudinary URLs
+  const { currentUser } = useSelector((state) => state.user);
+  
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -20,7 +24,7 @@ export default function CreateListing() {
         }
       };
       reader.readAsDataURL(file);
-      setImages((old) => [...old, file]); 
+      setImages((old) => [...old, file]);
     });
   };
 
@@ -43,7 +47,8 @@ export default function CreateListing() {
       });
 
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.imagesLink) {
+        setImageUrls(data.imagesLink); // Save Cloudinary URLs
         alert("Images uploaded successfully!");
       } else {
         alert("Upload failed.");
@@ -59,6 +64,11 @@ export default function CreateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (imageUrls.length === 0) {
+      alert("Please upload images first.");
+      return;
+    }
+
     const form = e.target;
     const formData = {
       name: form.name.value,
@@ -72,12 +82,12 @@ export default function CreateListing() {
       parking: form.parking.checked,
       type: form.sale.checked ? "sale" : "rent",
       offer: form.offer.checked,
-      images: images,
-      userRef: "user-id-placeholder", // Replace with actual user ID from Redux or Auth
+      imageUrls: imageUrls, // Use Cloudinary URLs
+      userRef: currentUser._id, // Replace with actual user ID from Redux or Auth
     };
 
     try {
-      const res = await fetch("/api/listings", {
+      const res = await fetch("/api/listing/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -230,17 +240,22 @@ export default function CreateListing() {
           </div>
 
           {imagesPreview.length > 0 && (
-            imagesPreview.map(image => {
-                <img>
-                    {image}
-                </img>
-            })
+            <div className="flex flex-wrap gap-2">
+              {imagesPreview.map((image, idx) => (
+                <img
+                  key={idx}
+                  src={image}
+                  alt={`preview-${idx}`}
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ))}
+            </div>
           )}
 
           <button
             type="submit"
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-            disabled={imagesPreview.length === 0 || uploading}
+            disabled={imageUrls.length === 0 || uploading}
           >
             Create Listing
           </button>
