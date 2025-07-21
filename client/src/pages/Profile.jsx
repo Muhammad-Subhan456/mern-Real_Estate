@@ -9,6 +9,8 @@ import {
 } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { set } from "mongoose";
+import Listing from "../../../api/models/listing.models";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -17,6 +19,8 @@ export default function Profile() {
   const [preview, setPreview] = useState("");
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
+  const [showListingError, setShowListingError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   const navigate = useNavigate();
   // Redirect unauthenticated users
   useEffect(() => {
@@ -115,6 +119,21 @@ export default function Profile() {
     );
   }
 
+  const handleShowListings = async () => {
+    try {
+      setShowListingError(false);
+      const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      const data = await res.json();
+      if(data.success === false) {
+        setShowListingError(true);
+        return;
+      }
+      setUserListings(data);
+    } catch (error) {
+      setShowListingError(true);
+    }
+  }
+  console.log(userListings)
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -174,6 +193,30 @@ export default function Profile() {
           Sign out
         </span>
       </div>
+      <button onClick={handleShowListings} className=" bg-green-700 ml-50 text-white p-3 rounded-lg uppercase hover:opacity-75">
+        Show Listings
+      </button>
+      <p className="text-red-500">{showListingError ? "Failed to show listings." : ""}</p>
+      {userListings && userListings.length > 0 && 
+        userListings.map((listing)=><div key={listing._id} className="border rounded-lg
+        p-3 flex justify-between items-center gap-4
+        ">
+          <Link to={`/listing/${listing._id}`} >
+            <img log src={listing.imageUrls[0]?.url} alt="Listing image"
+            className="h-16 w-16 object-contain"
+            ></img>
+          </Link>
+          <Link className="text-slate-700 font font-semibold hover:underline truncate "  to={`/listing/${listing._id}`} > 
+          <p >{listing.name}</p>
+          </Link>
+          <div className="flex flex-col items-center" > 
+                <button className="text-red-700 uppercase font-semibold" >Delete</button>
+                <button className="text-green-700 uppercase font-semibold" >Edit</button>
+          </div>
+        </div>
+
+        )
+      }
     </div>
   );
 }
