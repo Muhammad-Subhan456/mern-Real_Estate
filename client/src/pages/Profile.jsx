@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { set } from "mongoose";
 import Listing from "../../../api/models/listing.models";
+import updateListing from "./updateListing";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -226,7 +227,9 @@ export default function Profile() {
           </Link>
           <div className="flex flex-col items-center" > 
                 <button onClick={()=> handleListingDelete(listing._id)} className="text-red-700 uppercase font-semibold " >Delete</button>
+                <Link to={`/update-listing/${listing._id}` } >
                 <button className="text-green-700 uppercase font-semibold" >Edit</button>
+                </Link>
           </div>
         </div>
 
