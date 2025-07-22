@@ -1,52 +1,78 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import {useNavigate , useParams } from "react-router-dom";
-import { errorHandler } from "../../../api/utils/error";
-export default function CreateListing() {
+import { useNavigate, useParams } from "react-router-dom";
+
+export default function UpdateListing() {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
   const [imagesPreview, setImagesPreview] = useState([]);
-  const [imageUrls, setImageUrls] = useState([]); // Store Cloudinary URLs
+  const [imageUrls, setImageUrls] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    address: "",
+    regularPrice: 0,
+    discountPrice: 0,
+    bathrooms: 1,
+    bedrooms: 1,
+    furnished: false,
+    parking: false,
+    type: "rent",
+    offer: false,
+  });
+
   const { currentUser } = useSelector((state) => state.user);
-    const params = useParams();
+  const params = useParams();
+  const navigate = useNavigate();
+
   useEffect(() => {
-    const fetchListing = async() => {
+    const fetchListing = async () => {
+      try {
         const listingId = params.listingId;
         const res = await fetch(`/api/listing/get/${listingId}`);
-        const data = await res.json()
-        if(data.success===false){
-            console.log(data.message);
-            
+        const data = await res.json();
+        if (data.success === false) {
+          console.log(data.message);
+          return;
         }
-        formData = data
-        
-    }
-  
-     {
-      
-    }
-  }, [])
-  
-  
-  const navigate = useNavigate();
+
+        setFormData({
+          name: data.name || "",
+          description: data.description || "",
+          address: data.address || "",
+          regularPrice: data.regularPrice || 0,
+          discountPrice: data.discountPrice || 0,
+          bathrooms: data.bathrooms || 1,
+          bedrooms: data.bedrooms || 1,
+          furnished: data.furnished || false,
+          parking: data.parking || false,
+          type: data.type || "rent",
+          offer: data.offer || false,
+        });
+
+        setImageUrls(data.imageUrls || []);
+      } catch (err) {
+        console.error("Failed to fetch listing:", err);
+      }
+    };
+
+    fetchListing();
+  }, [params.listingId]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-
     setImages([]);
     setImagesPreview([]);
 
     files.forEach((file) => {
       const reader = new FileReader();
-
       reader.onload = () => {
         if (reader.readyState === 2) {
-          setImagesPreview((old) => [...old, reader.result]);
+          setImagesPreview((prev) => [...prev, reader.result]);
         }
       };
       reader.readAsDataURL(file);
-      setImages((old) => [...old, file]);
+      setImages((prev) => [...prev, file]);
     });
   };
 
@@ -58,19 +84,16 @@ export default function CreateListing() {
 
     setUploading(true);
     const formData = new FormData();
-    for (let i = 0; i < images.length; i++) {
-      formData.append("images", images[i]);
-    }
+    images.forEach((img) => formData.append("images", img));
 
     try {
       const res = await fetch("/api/upload-listing", {
         method: "POST",
         body: formData,
       });
-
       const data = await res.json();
       if (data.success && data.imagesLink) {
-        setImageUrls(data.imagesLink); // Save Cloudinary URLs
+        setImageUrls(data.imagesLink);
         alert("Images uploaded successfully!");
       } else {
         alert("Upload failed.");
@@ -91,38 +114,27 @@ export default function CreateListing() {
       return;
     }
 
-    const form = e.target;
-    const formData = {
-      name: form.name.value,
-      description: form.description.value,
-      address: form.address.value,
-      regularPrice: +form.regularPrice.value,
-      discountPrice: +form.discountPrice.value,
-      bathrooms: +form.bathrooms.value,
-      bedrooms: +form.bedrooms.value,
-      furnished: form.furnished.checked,
-      parking: form.parking.checked,
-      type: form.sale.checked ? "sale" : "rent",
-      offer: form.offer.checked,
-      imageUrls: imageUrls, // Use Cloudinary URLs
-      userRef: currentUser._id, // Replace with actual user ID from Redux or Auth
+    const submissionData = {
+      ...formData,
+      imageUrls,
+      userRef: currentUser._id,
     };
 
     try {
-      const res = await fetch(`api/listing/update/${params.listingId}`, {
+      const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       const data = await res.json();
       if (data.success) {
-        alert("Listing created!");
-        navigate(`/listing/${data.listing._id}`); // Redirect to the new listing page
+        alert("Listing updated!");
+        navigate(`/listing/${data.listing._id}`);
       } else {
-        alert("Failed to create listing");
+        alert("Failed to update listing");
       }
     } catch (error) {
       console.error("Submit error:", error);
@@ -142,6 +154,8 @@ export default function CreateListing() {
             placeholder="Name"
             className="border p-3 rounded-lg bg-white"
             id="name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             maxLength="62"
             minLength="10"
             required
@@ -150,6 +164,8 @@ export default function CreateListing() {
             placeholder="Description"
             className="border p-3 rounded-lg bg-white"
             id="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             required
           />
           <input
@@ -157,28 +173,60 @@ export default function CreateListing() {
             placeholder="Address"
             className="border p-3 rounded-lg bg-white"
             id="address"
+            value={formData.address}
+            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
             required
           />
 
           <div className="flex gap-6 flex-wrap">
             <div className="flex gap-2">
-              <input type="checkbox" id="sale" className="w-5" />
+              <input
+                type="checkbox"
+                id="sale"
+                className="w-5"
+                checked={formData.type === "sale"}
+                onChange={() => setFormData({ ...formData, type: "sale" })}
+              />
               <span>Sell</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="rent" className="w-5" />
+              <input
+                type="checkbox"
+                id="rent"
+                className="w-5"
+                checked={formData.type === "rent"}
+                onChange={() => setFormData({ ...formData, type: "rent" })}
+              />
               <span>Rent</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="parking" className="w-5" />
+              <input
+                type="checkbox"
+                id="parking"
+                className="w-5"
+                checked={formData.parking}
+                onChange={(e) => setFormData({ ...formData, parking: e.target.checked })}
+              />
               <span>Parking</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="furnished" className="w-5" />
+              <input
+                type="checkbox"
+                id="furnished"
+                className="w-5"
+                checked={formData.furnished}
+                onChange={(e) => setFormData({ ...formData, furnished: e.target.checked })}
+              />
               <span>Furnished</span>
             </div>
             <div className="flex gap-2">
-              <input type="checkbox" id="offer" className="w-5" />
+              <input
+                type="checkbox"
+                id="offer"
+                className="w-5"
+                checked={formData.offer}
+                onChange={(e) => setFormData({ ...formData, offer: e.target.checked })}
+              />
               <span>Offer</span>
             </div>
           </div>
@@ -192,6 +240,8 @@ export default function CreateListing() {
                 max="10"
                 required
                 className="p-3 border border-gray-300 rounded-lg bg-white"
+                value={formData.bedrooms}
+                onChange={(e) => setFormData({ ...formData, bedrooms: +e.target.value })}
               />
               <p>Beds</p>
             </div>
@@ -203,6 +253,8 @@ export default function CreateListing() {
                 max="10"
                 required
                 className="p-3 border border-gray-300 rounded-lg bg-white"
+                value={formData.bathrooms}
+                onChange={(e) => setFormData({ ...formData, bathrooms: +e.target.value })}
               />
               <p>Baths</p>
             </div>
@@ -213,6 +265,8 @@ export default function CreateListing() {
                 min="1"
                 required
                 className="p-3 border border-gray-300 rounded-lg bg-white"
+                value={formData.regularPrice}
+                onChange={(e) => setFormData({ ...formData, regularPrice: +e.target.value })}
               />
               <div className="flex flex-col items-center">
                 <p>Regular price</p>
@@ -226,6 +280,8 @@ export default function CreateListing() {
                 min="1"
                 required
                 className="p-3 border border-gray-300 rounded-lg bg-white"
+                value={formData.discountPrice}
+                onChange={(e) => setFormData({ ...formData, discountPrice: +e.target.value })}
               />
               <div className="flex flex-col items-center">
                 <p>Discounted price</p>
@@ -274,13 +330,13 @@ export default function CreateListing() {
               ))}
             </div>
           )}
-
+        
           <button
             type="submit"
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
-            disabled={imageUrls.length === 0 || uploading}
+            disabled={uploading || imageUrls.length === 0}
           >
-            UPdate Listing
+            Update Listing
           </button>
         </div>
       </form>
