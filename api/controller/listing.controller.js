@@ -59,49 +59,48 @@ export const getListing = async(req,res,next)=>{
     }
 }
 
-export const getListings = async(req,res,next) =>{
-      try {
-        const limit = parseInt(req.query.limit) || 9;
-        const startIndex = parseInt(req.query.startIndex) || 0;
-        let offer = req.query.offer;
-        if(offer=== undefined || offer === 'false'){
-          offer = { $in: [false,true] }
-        }
+export const getListings = async (req, res, next) => {
+  try {
+    const limit = parseInt(req.query.limit) || 9;
+    const startIndex = parseInt(req.query.startIndex) || 0;
 
-        let furnished = req.query.furnished;
-        if(furnished === undefined || furnished === 'false'){
-            furnished = { $in: [false,true]};
-        }
-        let parking = req.query.parking;
-        if(parking === undefined || parking === 'false'){
-            parking = { $in: [false,true]};
-        }
+    let offer = req.query.offer;
+    if (offer === undefined || offer === 'false') {
+      offer = { $in: [false, true] };
+    }
 
-        let type = req.query.type;
-        if(type === undefined || type === 'all'){
-          type = {$in: ['sale','rent'] };
-        }
+    let furnished = req.query.furnished;
+    if (furnished === undefined || furnished === 'false') {
+      furnished = { $in: [false, true] };
+    }
 
-        const searchTerm = req.query.searchTerm || '';
-        const sort = req.query.sort || 'createdAt';
-        const order = req.query.order || 'desc';
+    let parking = req.query.parking;
+    if (parking === undefined || parking === 'false') {
+      parking = { $in: [false, true] };
+    }
 
-        const listings = await ListingModel.find({
-            name: {$regex: searchTerm, $options : 'i' },
-            offer,
-            furnished,
-            parking,
-            type,
-        }).sort(
-          {
-            [sort] : order
-          }
-        ).limit(limit).skip(startIndex)
+    let type = req.query.type;
+    if (type === undefined || type === 'all') {
+      type = { $in: ['sale', 'rent'] };
+    }
 
-        return res.status(200).json(listings)
+    const searchTerm = req.query.searchTerm || '';
+    const sort = req.query.sort || 'createdAt';
+    const order = req.query.order === 'desc' ? -1 : 1;
 
-      } catch (error) {
-       next(error) 
-      }
-  
-}
+    const listings = await ListingModel.find({
+      name: { $regex: searchTerm, $options: 'i' },
+      offer,
+      furnished,
+      parking,
+      type,
+    })
+      .sort({ [sort]: order }) // ✅ safe sorting
+      .limit(limit)
+      .skip(startIndex);
+
+    return res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+};
