@@ -40,6 +40,10 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
+app.get("/", (req, res) => {
+  res.send("Backend is working 🚀");
+});
+
 // flow = index -> routes (endpoints) -> controller(api)
 app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
