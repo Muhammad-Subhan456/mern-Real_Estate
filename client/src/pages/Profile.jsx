@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { set } from "mongoose";
 import Listing from "../../../api/models/listing.models";
-import updateListing from "./updateListing";
+import updateListing from "./UpdateListing";
 
 export default function Profile() {
   const fileRef = useRef(null);
