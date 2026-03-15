@@ -34,9 +34,11 @@ cloudinary.config({
     api_secret: "-L6mEDeHTaGeBpl07KBOxMI_Oks"
 })
 
-app.listen(3000,()=>{
-    console.log(`Server is Running on Port 3000!!!!`)
-})
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 // flow = index -> routes (endpoints) -> controller(api)
 app.use("/api/user", userRouter);
