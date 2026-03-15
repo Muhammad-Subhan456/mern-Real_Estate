@@ -6,7 +6,7 @@ import About from './pages/About'
 import Signin from "./pages/Signin"
 import Profile from "./pages/Profile"
 import Header from './assets/components/Header'
-import PrivateRoute from './assets/components/privateRoute'
+import PrivateRoute from "./assets/components/PrivateRoute";
 import CreateListing from './pages/CreateListing'
 import UpdateListing from './pages/updateListing'
 import Listing from './pages/Listing'
