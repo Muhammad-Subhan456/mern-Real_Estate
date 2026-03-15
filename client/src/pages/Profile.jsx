@@ -9,8 +9,6 @@ import {
 } from "../redux/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Listing from "../../../api/models/listing.models";
-import updateListing from "./UpdateListing";
 import { API_URL } from "../utils/api";
 
 
@@ -99,7 +97,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
-      const res = await fetch("${API_URL}/api/auth/signout", {
+      const res = await fetch(`${API_URL}/api/auth/signout`, {
         method: "POST",
       });
       const data = await res.json();

@@ -89,7 +89,7 @@ export default function UpdateListing() {
     images.forEach((img) => formData.append("images", img));
 
     try {
-      const res = await fetch("${API_URL}/api/upload-listing", {
+      const res = await fetch(`${API_URL}/api/upload-listing`, {
         method: "POST",
         body: formData,
       });

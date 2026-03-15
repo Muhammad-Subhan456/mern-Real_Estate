@@ -42,7 +42,7 @@ export default function CreateListing() {
     }
 
     try {
-      const res = await fetch("${API_URL}/api/upload-listing", {
+      const res = await fetch(`${API_URL}/api/upload-listing`, {
         method: "POST",
         body: formData,
       });
@@ -88,7 +88,7 @@ export default function CreateListing() {
     };
 
     try {
-      const res = await fetch("${API_URL}/api/listing/create", {
+      const res = await fetch(`${API_URL}/api/listing/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

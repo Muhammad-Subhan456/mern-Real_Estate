@@ -22,7 +22,7 @@ export default function SignIn() {
     try {
       e.preventDefault();
       dispatch(signInStart());
-      const res = await fetch('${API_URL}/api/auth/signin',
+      const res = await fetch(`${API_URL}/api/auth/signin`,
         {
           method: 'POST',
           headers:{
