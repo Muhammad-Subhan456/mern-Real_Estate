@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_URL } from "../utils/api";
+
 
 export default function UpdateListing() {
   const [uploading, setUploading] = useState(false);
@@ -29,7 +31,7 @@ export default function UpdateListing() {
     const fetchListing = async () => {
       try {
         const listingId = params.listingId;
-        const res = await fetch(`/api/listing/get/${listingId}`);
+        const res = await fetch(`${API_URL}/api/listing/get/${listingId}`);
         const data = await res.json();
         if (data.success === false) {
           console.log(data.message);
@@ -87,7 +89,7 @@ export default function UpdateListing() {
     images.forEach((img) => formData.append("images", img));
 
     try {
-      const res = await fetch("/api/upload-listing", {
+      const res = await fetch("${API_URL}/api/upload-listing", {
         method: "POST",
         body: formData,
       });
@@ -121,7 +123,7 @@ export default function UpdateListing() {
     };
 
     try {
-      const res = await fetch(`/api/listing/update/${params.listingId}`, {
+      const res = await fetch(`${API_URL}/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

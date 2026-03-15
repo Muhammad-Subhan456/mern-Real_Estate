@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import {useNavigate} from "react-router-dom";
+import { API_URL } from "../utils/api";
 export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [images, setImages] = useState([]);
@@ -41,7 +42,7 @@ export default function CreateListing() {
     }
 
     try {
-      const res = await fetch("/api/upload-listing", {
+      const res = await fetch("${API_URL}/api/upload-listing", {
         method: "POST",
         body: formData,
       });
@@ -87,7 +88,7 @@ export default function CreateListing() {
     };
 
     try {
-      const res = await fetch("/api/listing/create", {
+      const res = await fetch("${API_URL}/api/listing/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

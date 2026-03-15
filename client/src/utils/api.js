@@ -1,0 +1,1 @@
+export const API_URL = "https://exemplary-achievement-production.up.railway.app";

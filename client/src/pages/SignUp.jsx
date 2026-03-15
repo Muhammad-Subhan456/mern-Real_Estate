@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import {Link , useNavigate } from "react-router-dom"
 import OAuth from '../assets/components/OAuth';
+import { API_URL } from "../utils/api";
+
 
 export default function SignUp() {
   const [formData, setFormData] = useState({})
@@ -18,7 +20,7 @@ export default function SignUp() {
     try {
       e.preventDefault();
       setLoading(true);
-      const res = await fetch('api/auth/signup',
+      const res = await fetch('${API_URL}/api/auth/signup',
         {
           method: 'POST',
           headers:{

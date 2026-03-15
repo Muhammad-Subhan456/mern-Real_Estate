@@ -12,6 +12,8 @@ import { Link } from "react-router-dom";
 import { set } from "mongoose";
 import Listing from "../../../api/models/listing.models";
 import updateListing from "./UpdateListing";
+import { API_URL } from "../utils/api";
+
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -59,7 +61,7 @@ export default function Profile() {
     if (formData.password) updatedData.append("password", formData.password);
 
     try {
-      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+      const res = await fetch(`${API_URL}/api/user/update/${currentUser._id}`, {
         method: "PUT",
         body: updatedData,
       });
@@ -81,7 +83,7 @@ export default function Profile() {
   const handleDeleteUser = async () => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      const res = await fetch(`${API_URL}/api/user/delete/${currentUser._id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -98,7 +100,7 @@ export default function Profile() {
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
-      const res = await fetch("/api/auth/signout", {
+      const res = await fetch("${API_URL}/api/auth/signout", {
         method: "POST",
       });
       const data = await res.json();
@@ -123,7 +125,7 @@ export default function Profile() {
   const handleShowListings = async () => {
     try {
       setShowListingError(false);
-      const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      const res = await fetch(`${API_URL}/api/user/listings/${currentUser._id}`);
       const data = await res.json();
       if(data.success === false) {
         setShowListingError(true);
@@ -136,7 +138,7 @@ export default function Profile() {
   }
   const handleListingDelete = async(listingId) =>{
     try {
-      const res = await fetch(`/api/listing/delete/${listingId}`,{
+      const res = await fetch(`${API_URL}/api/listing/delete/${listingId}`,{
         method: 'DELETE',
       })
       const data = await res.json();
