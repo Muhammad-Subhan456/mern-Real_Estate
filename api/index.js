@@ -10,6 +10,15 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import listingRouter from "./routes/listing.routes.js"
 import uploadRoutes from './routes/listing.upload.routes.js';
+import cors from "cors";
+
+app.use(
+  cors({
+    origin: "https://mern-real-estate-gray-three.vercel.app",
+    credentials: true,
+  })
+);
+
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>{
     console.log("Connected to Mongodb!");
