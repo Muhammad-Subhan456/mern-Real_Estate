@@ -10,7 +10,6 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import listingRouter from "./routes/listing.routes.js"
 import uploadRoutes from './routes/listing.upload.routes.js';
-import path from "path";
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>{
     console.log("Connected to Mongodb!");
@@ -57,11 +56,3 @@ app.use((err,req,res,next)=>{
     })
 })
 
-
-const __dirname = path.resolve();
-
-app.use(express.static(path.join(__dirname, "../client/dist")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-});
