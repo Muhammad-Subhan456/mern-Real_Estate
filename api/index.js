@@ -12,12 +12,7 @@ import listingRouter from "./routes/listing.routes.js"
 import uploadRoutes from './routes/listing.upload.routes.js';
 import cors from "cors";
 
-app.use(
-  cors({
-    origin: "https://mern-real-estate-gray-three.vercel.app",
-    credentials: true,
-  })
-);
+
 
 dotenv.config();
 mongoose.connect(process.env.MONGO).then(()=>{
@@ -27,6 +22,12 @@ mongoose.connect(process.env.MONGO).then(()=>{
 })
 
 const app = express();
+app.use(
+  cors({
+    origin: "https://mern-real-estate-gray-three.vercel.app",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser())
